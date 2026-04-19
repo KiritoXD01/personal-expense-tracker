@@ -6,13 +6,17 @@ namespace App\Filament\Widgets;
 
 use App\Enums\TransactionTypeEnum;
 use App\Models\Account;
+use App\Models\Subscription;
 use App\Models\Transaction;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 final class FinancialOverviewWidget extends StatsOverviewWidget
 {
+    protected static bool $isLazy = false;
+
     protected int|string|array $columnSpan = 'full';
 
     protected ?string $heading = 'Financial overview';
@@ -63,6 +67,18 @@ final class FinancialOverviewWidget extends StatsOverviewWidget
                 ->color('success');
         }
 
+        $currentMonthSubscriptions = $this->getCurrentMonthSubscriptions();
+
+        $stats[] = Stat::make('Subscriptions this month', (string) $currentMonthSubscriptions->count())
+            ->description('Recurring payments due this month')
+            ->color('warning');
+
+        foreach ($this->getCurrentMonthSubscriptionTotals($currentMonthSubscriptions) as $currency => $total) {
+            $stats[] = Stat::make("Subscriptions due ({$currency})", $this->formatAmount($total))
+                ->description('Current month recurring payments')
+                ->color('warning');
+        }
+
         return $stats;
     }
 
@@ -77,6 +93,27 @@ final class FinancialOverviewWidget extends StatsOverviewWidget
             ->groupBy('currency')
             ->orderBy('currency')
             ->pluck('total', 'currency')
+            ->all();
+    }
+
+    protected function getCurrentMonthSubscriptions(): Collection
+    {
+        return Subscription::query()
+            ->where('user_id', Auth::id())
+            ->get()
+            ->filter(fn (Subscription $subscription): bool => $subscription->isDueInMonth(today()))
+            ->values();
+    }
+
+    /**
+     * @param  Collection<int, Subscription>  $subscriptions
+     * @return array<string, string>
+     */
+    protected function getCurrentMonthSubscriptionTotals(Collection $subscriptions): array
+    {
+        return $subscriptions
+            ->groupBy('currency')
+            ->map(fn (Collection $group): string => $this->formatAmount($group->sum('price')))
             ->all();
     }
 

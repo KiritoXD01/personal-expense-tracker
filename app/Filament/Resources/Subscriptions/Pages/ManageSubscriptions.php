@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Banks\Pages;
+namespace App\Filament\Resources\Subscriptions\Pages;
 
-use App\Filament\Resources\Banks\BankResource;
+use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ManageRecords;
 
-final class ManageBanks extends ManageRecords
+final class ManageSubscriptions extends ManageRecords
 {
-    protected static string $resource = BankResource::class;
+    protected static string $resource = SubscriptionResource::class;
 
     protected function getHeaderActions(): array
     {

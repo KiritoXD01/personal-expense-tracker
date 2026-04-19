@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Widgets\FinancialOverviewWidget;
 use App\Filament\Widgets\RecentTransactionsWidget;
+use App\Filament\Widgets\UpcomingSubscriptionsWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 final class Dashboard extends BaseDashboard
@@ -14,6 +15,7 @@ final class Dashboard extends BaseDashboard
     {
         return [
             FinancialOverviewWidget::class,
+            UpcomingSubscriptionsWidget::class,
             RecentTransactionsWidget::class,
         ];
     }

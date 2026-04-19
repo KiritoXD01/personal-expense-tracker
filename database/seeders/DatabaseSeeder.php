@@ -7,6 +7,8 @@ namespace Database\Seeders;
 use App\Models\Account;
 use App\Models\Bank;
 use App\Models\Card;
+use App\Models\Subscription;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -33,19 +35,42 @@ final class DatabaseSeeder extends Seeder
             ]);
 
         foreach ($banks as $bank) {
-            Card::factory()
+            $cards = Card::factory()
                 ->count(2)
                 ->create([
                     'user_id' => $user->id,
                     'bank_id' => $bank->id,
                 ]);
 
-            Account::factory()
+            $accounts = Account::factory()
                 ->count(2)
                 ->create([
                     'user_id' => $user->id,
                     'bank_id' => $bank->id,
                 ]);
+
+            foreach ($cards as $card) {
+                Subscription::factory()
+                    ->create([
+                        'user_id' => $user->id,
+                        'linked_to' => $card->id,
+                    ]);
+
+                Transaction::factory()
+                    ->count(2)
+                    ->create([
+                        'transactable_id' => $card->id,
+                    ]);
+            }
+
+            foreach ($accounts as $account) {
+                Transaction::factory()
+                    ->forAccount()
+                    ->count(2)
+                    ->create([
+                        'transactable_id' => $account->id,
+                    ]);
+            }
         }
     }
 }
