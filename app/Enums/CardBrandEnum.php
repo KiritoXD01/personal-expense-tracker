@@ -1,9 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enums;
 
-enum CreditCardTypeEnum: string
+use App\Traits\HasEnumUtils;
+
+enum CardBrandEnum: string
 {
+    use HasEnumUtils;
+
     case VISA = 'visa';
     case MASTERCARD = 'mastercard';
     case AMERICAN_EXPRESS = 'american_express';
