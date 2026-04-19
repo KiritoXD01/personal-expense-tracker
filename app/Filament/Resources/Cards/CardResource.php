@@ -56,10 +56,14 @@ final class CardResource extends Resource
                 Select::make('type')
                     ->label('Card Type')
                     ->options(CardTypeEnum::class)
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Select::make('currency')
                     ->label('Currency')
                     ->options(CurrencyEnum::class)
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 TextInput::make('last_four_digits')
                     ->label('Last Four Digits')
@@ -74,20 +78,16 @@ final class CardResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('brand')
-                    ->label('Brand')
-                    ->formatStateUsing(fn (CardBrandEnum $state): string => $state->value)
-                    ->view('filament.columns.card-brand-column'),
+                    ->label('Brand'),
                 TextColumn::make('type')
                     ->label('Type')
-                    ->formatStateUsing(fn (CardTypeEnum $state): string => $state->value)
                     ->badge()
                     ->color(fn (CardTypeEnum $state): string => match ($state) {
                         CardTypeEnum::DEBIT => 'success',
                         CardTypeEnum::CREDIT => 'info',
                     }),
                 TextColumn::make('currency')
-                    ->label('Currency')
-                    ->formatStateUsing(fn (CurrencyEnum $state): string => $state->value),
+                    ->label('Currency'),
                 TextColumn::make('last_four_digits')
                     ->label('Card Number')
                     ->formatStateUsing(fn (Card $record): string => "**** **** **** {$record->last_four_digits}"),
@@ -97,19 +97,11 @@ final class CardResource extends Resource
                 TextColumn::make('name')
                     ->label('Name')
                     ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('user_id', auth()->id()))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('user_id', Auth::id()))
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),

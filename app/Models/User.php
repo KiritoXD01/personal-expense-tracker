@@ -24,6 +24,8 @@ use Illuminate\Support\Carbon;
  * @property-read Carbon $created_at
  * @property-read Carbon $updated_at
  * @property-read Bank[] $banks
+ * @property-read Card[] $cards
+ * @property-read Account[] $bankAccounts
  */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -41,6 +43,24 @@ final class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(
             related: Bank::class,
+            foreignKey: 'user_id',
+            localKey: 'id',
+        );
+    }
+
+    public function cards(): HasMany
+    {
+        return $this->hasMany(
+            related: Card::class,
+            foreignKey: 'user_id',
+            localKey: 'id',
+        );
+    }
+
+    public function bankAccounts(): HasMany
+    {
+        return $this->hasMany(
+            related: Account::class,
             foreignKey: 'user_id',
             localKey: 'id',
         );
