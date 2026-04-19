@@ -10,7 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -18,6 +18,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class BankResource extends Resource
 {
@@ -29,10 +30,8 @@ class BankResource extends Resource
     {
         return $schema
             ->components([
-                Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->required(),
+                Hidden::make('user_id')
+                    ->default(auth()->id()),
                 TextInput::make('name')
                     ->maxLength(255)
                     ->required(),
@@ -50,9 +49,6 @@ class BankResource extends Resource
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('user.name')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -65,6 +61,7 @@ class BankResource extends Resource
             ->filters([
                 //
             ])
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('user_id', auth()->id()))
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
