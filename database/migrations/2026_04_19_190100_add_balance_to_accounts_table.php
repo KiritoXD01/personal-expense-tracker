@@ -14,11 +14,4 @@ return new class extends Migration
             $table->decimal('balance', 12, 2)->default(0);
         });
     }
-
-    public function down(): void
-    {
-        Schema::table('accounts', function (Blueprint $table): void {
-            $table->dropColumn('balance');
-        });
-    }
 };

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Cards\Schemas;
 
-use App\Enums\CardTypeEnum;
-use App\Models\Card;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -24,8 +22,7 @@ final class CardInfolist
                     ->badge(),
                 TextEntry::make('credit_limit')
                     ->label('Credit Limit')
-                    ->visible(fn (Card $record): bool => $record->type === CardTypeEnum::CREDIT)
-                    ->formatStateUsing(fn (Card $record): string => "{$record->currency->value} ".number_format((float) $record->credit_limit, 2, '.', ',')),
+                    ->formatStateUsing(fn ($state): string => filled($state) ? number_format((float) $state, 2, '.', ',') : '-'),
                 TextEntry::make('currency')
                     ->badge(),
                 TextEntry::make('last_four_digits'),

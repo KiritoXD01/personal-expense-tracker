@@ -19,16 +19,8 @@ return new class extends Migration
             $table->foreignId('bank_id')->references('id')->on('banks')->cascadeOnDelete();
             $table->string('name');
             $table->string('type');
-            $table->string('currency');
+            $table->string('currency', 3);
             $table->timestamps();
         });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('accounts');
     }
 };

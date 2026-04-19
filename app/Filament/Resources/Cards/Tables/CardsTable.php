@@ -39,8 +39,7 @@ final class CardsTable
                     }),
                 TextColumn::make('credit_limit')
                     ->label('Credit Limit')
-                    ->visible(fn (Card $record): bool => $record->type === CardTypeEnum::CREDIT)
-                    ->formatStateUsing(fn (Card $record): string => "{$record->currency->value} ".number_format((float) $record->credit_limit, 2, '.', ',')),
+                    ->formatStateUsing(fn ($state): string => filled($state) ? number_format((float) $state, 2, '.', ',') : '-'),
                 TextColumn::make('currency')
                     ->badge()
                     ->searchable(),

@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Banks;
 
 use App\Filament\Resources\Banks\Pages\ManageBanks;
+use App\Filament\Resources\Banks\Pages\ViewBank;
+use App\Filament\Resources\Banks\Schemas\BankInfolist;
 use App\Models\Bank;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
@@ -20,7 +25,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class BankResource extends Resource
+final class BankResource extends Resource
 {
     protected static ?string $model = Bank::class;
 
@@ -39,6 +44,11 @@ class BankResource extends Resource
                     ->image()
                     ->directory('bank-logos'),
             ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return BankInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -63,6 +73,7 @@ class BankResource extends Resource
             ])
             ->modifyQueryUsing(fn (Builder $query) => $query->where('user_id', auth()->id()))
             ->recordActions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -77,6 +88,7 @@ class BankResource extends Resource
     {
         return [
             'index' => ManageBanks::route('/'),
+            'view' => ViewBank::route('/{record}'),
         ];
     }
 }

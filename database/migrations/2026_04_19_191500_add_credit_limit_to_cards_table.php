@@ -14,11 +14,4 @@ return new class extends Migration
             $table->decimal('credit_limit', 12, 2)->nullable()->after('type');
         });
     }
-
-    public function down(): void
-    {
-        Schema::table('cards', function (Blueprint $table): void {
-            $table->dropColumn('credit_limit');
-        });
-    }
 };
