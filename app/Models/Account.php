@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -21,12 +22,14 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property AccountTypeEnum $type
  * @property CurrencyEnum $currency
+ * @property string $balance
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user
  * @property-read Bank $bank
+ * @property-read Transaction[] $transactions
  */
-#[Fillable('user_id', 'bank_id', 'name', 'type', 'currency')]
+#[Fillable('user_id', 'bank_id', 'name', 'type', 'currency', 'balance')]
 #[UseFactory(AccountFactory::class)]
 final class Account extends Model
 {
@@ -50,11 +53,20 @@ final class Account extends Model
         );
     }
 
+    public function transactions(): MorphMany
+    {
+        return $this->morphMany(
+            related: Transaction::class,
+            name: 'transactable',
+        );
+    }
+
     protected function casts(): array
     {
         return [
             'type' => AccountTypeEnum::class,
             'currency' => CurrencyEnum::class,
+            'balance' => 'decimal:2',
         ];
     }
 }

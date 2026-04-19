@@ -24,14 +24,25 @@ final class CardFactory extends Factory
      */
     public function definition(): array
     {
+        $type = CardTypeEnum::random();
+
         return [
             'user_id' => User::factory(),
             'bank_id' => Bank::factory(),
             'name' => fake()->name(),
             'last_four_digits' => fake()->numerify('####'),
-            'type' => CardTypeEnum::random(),
+            'type' => $type,
             'brand' => CardBrandEnum::random(),
             'currency' => CurrencyEnum::random(),
+            'credit_limit' => $type === CardTypeEnum::CREDIT ? fake()->randomFloat(2, 1000, 50000) : null,
         ];
+    }
+
+    public function creditCard(): static
+    {
+        return $this->state(fn (): array => [
+            'type' => CardTypeEnum::CREDIT,
+            'credit_limit' => fake()->randomFloat(2, 1000, 50000),
+        ]);
     }
 }

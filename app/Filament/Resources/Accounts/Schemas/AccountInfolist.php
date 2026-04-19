@@ -16,6 +16,8 @@ final class AccountInfolist
                 TextEntry::make('bank.name')
                     ->label('Bank'),
                 TextEntry::make('name'),
+                TextEntry::make('balance')
+                    ->formatStateUsing(fn (string $state): string => number_format((float) $state, 2, '.', ',')),
                 TextEntry::make('type')
                     ->badge(),
                 TextEntry::make('currency')

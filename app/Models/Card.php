@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -22,16 +23,19 @@ use Illuminate\Support\Carbon;
  * @property-read CardBrandEnum $brand
  * @property-read CardTypeEnum $type
  * @property-read CurrencyEnum $currency
+ * @property-read string|null $credit_limit
  * @property-read string $last_four_digits
  * @property-read Carbon|null $created_at
  * @property-read Carbon|null $updated_at
  * @property-read User $user
  * @property-read Bank $bank
+ * @property-read Transaction[] $transactions
  */
 #[Fillable([
     'user_id',
     'bank_id',
     'currency',
+    'credit_limit',
     'name',
     'brand',
     'type',
@@ -60,12 +64,21 @@ final class Card extends Model
         );
     }
 
+    public function transactions(): MorphMany
+    {
+        return $this->morphMany(
+            related: Transaction::class,
+            name: 'transactable',
+        );
+    }
+
     protected function casts(): array
     {
         return [
             'brand' => CardBrandEnum::class,
             'type' => CardTypeEnum::class,
             'currency' => CurrencyEnum::class,
+            'credit_limit' => 'decimal:2',
         ];
     }
 }

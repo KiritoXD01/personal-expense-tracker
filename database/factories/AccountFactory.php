@@ -29,6 +29,7 @@ final class AccountFactory extends Factory
             'name' => fake()->word(),
             'type' => AccountTypeEnum::random(),
             'currency' => CurrencyEnum::random(),
+            'balance' => fake()->randomFloat(2, 0, 10000),
         ];
     }
 }

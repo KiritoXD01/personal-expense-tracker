@@ -11,6 +11,8 @@ use App\Models\Bank;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,9 +45,20 @@ final class CardForm
                 Select::make('type')
                     ->label('Card Type')
                     ->options(CardTypeEnum::class)
+                    ->live()
+                    ->afterStateUpdated(function (?string $state, Set $set): void {
+                        if ($state !== CardTypeEnum::CREDIT->value) {
+                            $set('credit_limit', null);
+                        }
+                    })
                     ->searchable()
                     ->preload()
                     ->required(),
+                TextInput::make('credit_limit')
+                    ->label('Credit Limit')
+                    ->numeric()
+                    ->visible(fn (Get $get): bool => $get('type') === CardTypeEnum::CREDIT->value)
+                    ->required(fn (Get $get): bool => $get('type') === CardTypeEnum::CREDIT->value),
                 Select::make('currency')
                     ->label('Currency')
                     ->options(CurrencyEnum::class)

@@ -33,6 +33,10 @@ final class AccountForm
                 TextInput::make('name')
                     ->maxLength(255)
                     ->required(),
+                TextInput::make('balance')
+                    ->numeric()
+                    ->default(0)
+                    ->required(),
                 Select::make('type')
                     ->options(AccountTypeEnum::class)
                     ->searchable()

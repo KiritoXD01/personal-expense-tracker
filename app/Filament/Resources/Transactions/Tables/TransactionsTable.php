@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\Accounts\Tables;
+namespace App\Filament\Resources\Transactions\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -13,27 +13,31 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-final class AccountsTable
+final class TransactionsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('bank.name')
-                    ->label('Bank')
-                    ->searchable(),
-                TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('balance')
+                TextColumn::make('transactable_type')
+                    ->label('Source Type')
+                    ->formatStateUsing(fn (string $state): string => class_basename($state))
+                    ->badge(),
+                TextColumn::make('transactable.name')
+                    ->label('Source'),
+                TextColumn::make('type')
+                    ->badge(),
+                TextColumn::make('currency')
+                    ->badge(),
+                TextColumn::make('amount')
                     ->sortable()
                     ->formatStateUsing(fn (string $state): string => number_format((float) $state, 2, '.', ',')),
-                TextColumn::make('type')
-                    ->badge()
-                    ->searchable(),
-                TextColumn::make('currency')
-                    ->badge()
-                    ->searchable(),
+                TextColumn::make('description')
+                    ->searchable()
+                    ->wrap(),
+                TextColumn::make('transacted_at')
+                    ->dateTime()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
