@@ -24,6 +24,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 final class CardResource extends Resource
 {
@@ -36,17 +37,21 @@ final class CardResource extends Resource
         return $schema
             ->components([
                 Hidden::make('user_id')
-                    ->default(auth()->id()),
+                    ->default(Auth::id()),
                 TextInput::make('name')
                     ->maxLength(255)
                     ->required(),
                 Select::make('bank_id')
                     ->label('Bank')
-                    ->options(fn (): array => Bank::where('user_id', auth()->id())->pluck('name', 'id')->all())
+                    ->options(fn (): array => Bank::query()->where('user_id', Auth::id())->pluck('name', 'id')->all())
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Select::make('brand')
                     ->label('Card Brand')
                     ->options(CardBrandEnum::class)
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Select::make('type')
                     ->label('Card Type')
