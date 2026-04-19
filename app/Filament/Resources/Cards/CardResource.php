@@ -4,27 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Cards;
 
-use App\Enums\CardBrandEnum;
-use App\Enums\CardTypeEnum;
-use App\Enums\CurrencyEnum;
-use App\Filament\Resources\Cards\Pages\ManageCards;
-use App\Models\Bank;
+use App\Filament\Resources\Cards\Pages\CreateCard;
+use App\Filament\Resources\Cards\Pages\EditCard;
+use App\Filament\Resources\Cards\Pages\ListCards;
+use App\Filament\Resources\Cards\Pages\ViewCard;
+use App\Filament\Resources\Cards\Schemas\CardForm;
+use App\Filament\Resources\Cards\Schemas\CardInfolist;
+use App\Filament\Resources\Cards\Tables\CardsTable;
 use App\Models\Card;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 final class CardResource extends Resource
 {
@@ -34,89 +26,31 @@ final class CardResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Hidden::make('user_id')
-                    ->default(Auth::id()),
-                TextInput::make('name')
-                    ->maxLength(255)
-                    ->required(),
-                Select::make('bank_id')
-                    ->label('Bank')
-                    ->options(fn (): array => Bank::query()->where('user_id', Auth::id())->pluck('name', 'id')->all())
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Select::make('brand')
-                    ->label('Card Brand')
-                    ->options(CardBrandEnum::class)
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Select::make('type')
-                    ->label('Card Type')
-                    ->options(CardTypeEnum::class)
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Select::make('currency')
-                    ->label('Currency')
-                    ->options(CurrencyEnum::class)
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                TextInput::make('last_four_digits')
-                    ->label('Last Four Digits')
-                    ->maxLength(4)
-                    ->numeric()
-                    ->required(),
-            ]);
+        return CardForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return CardInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                TextColumn::make('brand')
-                    ->label('Brand'),
-                TextColumn::make('type')
-                    ->label('Type')
-                    ->badge()
-                    ->color(fn (CardTypeEnum $state): string => match ($state) {
-                        CardTypeEnum::DEBIT => 'success',
-                        CardTypeEnum::CREDIT => 'info',
-                    }),
-                TextColumn::make('currency')
-                    ->label('Currency'),
-                TextColumn::make('last_four_digits')
-                    ->label('Card Number')
-                    ->formatStateUsing(fn (Card $record): string => "**** **** **** {$record->last_four_digits}"),
-                TextColumn::make('bank.name')
-                    ->label('Bank')
-                    ->searchable(),
-                TextColumn::make('name')
-                    ->label('Name')
-                    ->searchable(),
-            ])
-            ->filters([
-                //
-            ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('user_id', Auth::id()))
-            ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+        return CardsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ManageCards::route('/'),
+            'index' => ListCards::route('/'),
+            'create' => CreateCard::route('/create'),
+            'view' => ViewCard::route('/{record}'),
+            'edit' => EditCard::route('/{record}/edit'),
         ];
     }
 }

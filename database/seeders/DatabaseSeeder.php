@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Account;
 use App\Models\Bank;
 use App\Models\Card;
 use App\Models\User;
@@ -19,12 +20,32 @@ final class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()
-            ->has(Bank::factory()->count(3))
-            ->has(Card::factory()->count(2))
+        $user = User::factory()
             ->create([
                 'name' => 'Test User',
                 'email' => 'test@example.com',
             ]);
+
+        $banks = Bank::factory()
+            ->count(3)
+            ->create([
+                'user_id' => $user->id,
+            ]);
+
+        foreach ($banks as $bank) {
+            Card::factory()
+                ->count(2)
+                ->create([
+                    'user_id' => $user->id,
+                    'bank_id' => $bank->id,
+                ]);
+
+            Account::factory()
+                ->count(2)
+                ->create([
+                    'user_id' => $user->id,
+                    'bank_id' => $bank->id,
+                ]);
+        }
     }
 }
